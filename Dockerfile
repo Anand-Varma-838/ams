@@ -31,10 +31,6 @@ RUN composer install --no-dev --optimize-autoloader
 EXPOSE 9000
 CMD ["php-fpm"]
 
-# Nginx setup
-FROM nginx:alpine
-COPY ./nginx.conf /etc/nginx/nginx.conf
-
 # Copy the PHP app from the base stage
 COPY --from=base /var/www /var/www
 
