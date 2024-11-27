@@ -11,7 +11,11 @@ RUN apt-get update && apt-get install -y \
     git \
     libcurl4-openssl-dev \
     libxml2-dev \
-    libssl-dev
+    libssl-dev \
+    php8.1-mbstring \
+    php8.1-bcmath \
+    php8.1-pdo-mysql \
+    php8.1-xml
 
 # Install Composer (using official Composer image)
 COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
@@ -22,14 +26,15 @@ WORKDIR /var/www
 # Copy application code
 COPY . /var/www
 
-# Clear Composer cache (optional but recommended to avoid potential issues)
+# Clear Composer cache
 RUN composer clear-cache
 
 # Install PHP dependencies via Composer
 RUN composer install -vvv --no-dev --optimize-autoloader
 
 # Set proper file permissions for Laravel (storage and cache directories)
-RUN chmod -R 777 /var/www/storage /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Expose PHP-FPM port (default is 9000)
 EXPOSE 9000
