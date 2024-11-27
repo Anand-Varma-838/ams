@@ -29,8 +29,8 @@ COPY . /var/www
 # Clear Composer cache
 RUN composer clear-cache
 
-# Install PHP dependencies via Composer
-RUN composer install -vvv --no-dev --optimize-autoloader
+# Try to install dependencies with composer
+RUN composer install -vvv
 
 # Set proper file permissions for Laravel (storage and cache directories)
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
