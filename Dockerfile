@@ -1,8 +1,5 @@
-# Use an official PHP runtime as a parent image
+# Stage 1: Build the PHP environment
 FROM php:8.1-fpm as base
-
-# Set working directory
-WORKDIR /var/www
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -10,33 +7,23 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    locales \
     zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim unzip git curl
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql gd
+    git
 
 # Install Composer
 COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
 
-# Copy existing application directory contents
-COPY . /var/www
-
-# Install application dependencies
-RUN composer install --no-dev --optimize-autoloader
-
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
-CMD ["php-fpm"]
-
-# Copy the PHP app from the base stage
-COPY --from=base /var/www /var/www
-
-# Set working directory
+# Set the working directory
 WORKDIR /var/www
 
-EXPOSE 80
+# Copy the application code to the container
+COPY . /var/www
 
-CMD ["nginx", "-g", "daemon off;"]
+# Install PHP dependencies via Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Expose the necessary port for PHP-FPM (default is 9000)
+EXPOSE 9000
+
+# Command to run PHP-FPM server
+CMD ["php-fpm"]
