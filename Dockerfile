@@ -1,4 +1,3 @@
-# Stage 1: Build the PHP environment
 FROM php:8.1-fpm as base
 
 # Install dependencies
@@ -8,22 +7,25 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     zip \
-    git
+    git \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libssl-dev
 
 # Install Composer
 COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
 
-# Set the working directory
+# Set working directory
 WORKDIR /var/www
 
-# Copy the application code to the container
+# Copy application code
 COPY . /var/www
 
 # Install PHP dependencies via Composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Expose the necessary port for PHP-FPM (default is 9000)
+# Expose PHP-FPM port
 EXPOSE 9000
 
-# Command to run PHP-FPM server
+# Start PHP-FPM server
 CMD ["php-fpm"]
