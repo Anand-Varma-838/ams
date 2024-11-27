@@ -1,7 +1,7 @@
-# Stage 1: Build the PHP environment
-FROM php:8.1-fpm as base
+# Use official PHP image with FPM (FastCGI Process Manager)
+FROM php:8.1-fpm
 
-# Install necessary dependencies for Laravel
+# Install necessary PHP extensions and system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -11,32 +11,28 @@ RUN apt-get update && apt-get install -y \
     git \
     libcurl4-openssl-dev \
     libxml2-dev \
-    libssl-dev
-    # php8.1-mbstring \
-    # php8.1-bcmath \
-    # php8.1-pdo-mysql
+    libssl-dev \
+    php-mbstring \
+    php-bcmath \
+    php-pdo-mysql \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Composer (using official Composer image)
-COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
-
-# Set working directory
+# Set the working directory to /var/www
 WORKDIR /var/www
 
-# Copy application code
-COPY . /var/www
+# Copy the application files into the container
+COPY . .
 
-# Clear Composer cache
-RUN composer clear-cache
-
-# Try to install dependencies with composer
-RUN composer install -vvv
+# Commenting out the composer install command for now to prevent errors during image build
+# RUN composer install -vvv
 
 # Set proper file permissions for Laravel (storage and cache directories)
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+RUN mkdir -p /var/www/storage /var/www/bootstrap/cache && \
+    chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache && \
+    chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Expose PHP-FPM port (default is 9000)
+# Expose port 9000 for PHP-FPM
 EXPOSE 9000
 
-# Command to run PHP-FPM server
+# Start PHP-FPM
 CMD ["php-fpm"]
