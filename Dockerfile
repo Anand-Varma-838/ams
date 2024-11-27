@@ -11,11 +11,11 @@ RUN apt-get update && apt-get install -y \
     git \
     libcurl4-openssl-dev \
     libxml2-dev \
-    libssl-dev \
-    php-mbstring \
-    php-bcmath \
-    php-pdo-mysql \
-    && rm -rf /var/lib/apt/lists/*
+    libssl-dev
+    #php-mbstring \
+    #php-bcmath \
+    #php-pdo-mysql \
+    #&& rm -rf /var/lib/apt/lists/*
 
 # Set the working directory to /var/www
 WORKDIR /var/www
