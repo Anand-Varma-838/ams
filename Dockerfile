@@ -11,10 +11,10 @@ RUN apt-get update && apt-get install -y \
     git \
     libcurl4-openssl-dev \
     libxml2-dev \
-    libssl-dev \
-    php8.1-mbstring \
-    php8.1-bcmath \
-    php8.1-pdo-mysql
+    libssl-dev
+    # php8.1-mbstring \
+    # php8.1-bcmath \
+    # php8.1-pdo-mysql
 
 # Install Composer (using official Composer image)
 COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
