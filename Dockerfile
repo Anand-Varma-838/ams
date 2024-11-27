@@ -1,6 +1,7 @@
+# Stage 1: Build the PHP environment
 FROM php:8.1-fpm as base
 
-# Install dependencies
+# Install necessary dependencies for Laravel
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -12,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     libssl-dev
 
-# Install Composer
+# Install Composer (using official Composer image)
 COPY --from=composer:2.2 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
@@ -21,11 +22,17 @@ WORKDIR /var/www
 # Copy application code
 COPY . /var/www
 
-# Install PHP dependencies via Composer
-RUN composer install --no-dev --optimize-autoloader
+# Clear Composer cache (optional but recommended to avoid potential issues)
+RUN composer clear-cache
 
-# Expose PHP-FPM port
+# Install PHP dependencies via Composer
+RUN composer install -vvv --no-dev --optimize-autoloader
+
+# Set proper file permissions for Laravel (storage and cache directories)
+RUN chmod -R 777 /var/www/storage /var/www/bootstrap/cache
+
+# Expose PHP-FPM port (default is 9000)
 EXPOSE 9000
 
-# Start PHP-FPM server
+# Command to run PHP-FPM server
 CMD ["php-fpm"]
